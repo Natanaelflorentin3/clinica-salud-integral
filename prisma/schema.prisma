@@ -15,7 +15,8 @@ datasource db {
 
 model Paciente  {
   id        Int      @id @default(autoincrement())
-  nombre     String   
+  nombre     String  
+  apellido  String 
   telefono  String
   email    String   @unique
   fechaNacimiento DateTime
@@ -34,7 +35,8 @@ enum EspecialidadMedica {
 
 model Medico {
   id        Int      @id @default(autoincrement())
-  nombre     String   
+  nombre     String 
+  apellido String  
   especialidadMedica EspecialidadMedica
   telefono  String
   email    String   @unique
