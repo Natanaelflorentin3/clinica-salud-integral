@@ -1,4 +1,4 @@
-// src/models/patient.model.ts
+// src/models/doctor.model.ts
 import prisma from "../db/prisma.js";
 import type {  EspecialidadMedica } from "../generated/prisma/client.js";
 

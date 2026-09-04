@@ -1,0 +1,1 @@
+Decisión: POST /api/appointments está protegido para RECEPCIONISTA y MEDICO. El brief no asigna un actor explícito a 'Programación de citas'; se interpretó que ambos roles agendan turnos en el flujo real de una clínica (recepción por teléfono/mostrador, médico para seguimientos), mientras que GERENCIA queda excluido por no operar el módulo de consultorio.
