@@ -11,5 +11,6 @@ export function getAllDoctors(especialidad?: EspecialidadMedica) {
 }
 export function getDoctorById(id: number) {
   return prisma.medico.findUnique({ where: { id } });
+  
 
 }
