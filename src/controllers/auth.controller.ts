@@ -15,7 +15,8 @@ export async function register(req: Request, res: Response) {
     });
 
     res.status(201).json(user);
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error al registrar el usuario" });
   }
 }
