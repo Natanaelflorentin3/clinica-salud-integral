@@ -5,6 +5,29 @@ import jwt from "jsonwebtoken";
 import prisma from "../db/prisma.js";
 
 export async function register(req: Request, res: Response) {
+  /*
+    #swagger.tags = ['Auth']
+    #swagger.summary = 'Registrar un nuevo usuario'
+    #swagger.security = []
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["email", "password", "role"],
+            properties: {
+              email: { type: "string", example: "recepcion@test.com" },
+              password: { type: "string", example: "123456" },
+              role: { type: "string", enum: ["RECEPCIONISTA", "MEDICO", "GERENCIA"], example: "RECEPCIONISTA" }
+            }
+          }
+        }
+      }
+    }
+    #swagger.responses[201] = { description: "Usuario creado (sin password)" }
+    #swagger.responses[500] = { description: "Error al registrar el usuario" }
+  */
   try {
     const { email, password, role } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -22,6 +45,32 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function login(req: Request, res: Response) {
+  /*
+    #swagger.tags = ['Auth']
+    #swagger.summary = 'Iniciar sesión'
+    #swagger.security = []
+    #swagger.requestBody = {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            required: ["email", "password"],
+            properties: {
+              email: { type: "string", example: "recepcion@test.com" },
+              password: { type: "string", example: "123456" }
+            }
+          }
+        }
+      }
+    }
+    #swagger.responses[200] = {
+      description: "Login exitoso",
+      content: { "application/json": { schema: { type: "object", properties: { token: { type: "string" } } } } }
+    }
+    #swagger.responses[401] = { description: "Credenciales inválidas" }
+    #swagger.responses[500] = { description: "Error al iniciar sesión" }
+  */
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
