@@ -13,16 +13,17 @@ datasource db {
 
 }
 
-model Paciente  {
-  id        Int      @id @default(autoincrement())
-  nombre     String  
-  apellido  String 
-  telefono  String
-  email    String   @unique
-  fechaNacimiento DateTime
-  citas Cita[]
-}
+model Paciente {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  apellido        String
+  telefono        String
+  email           String   @unique
+  fechaNacimiento DateTime @map("fecha_nacimiento")
+  citas           Cita[]
 
+  @@map("pacientes")
+}
 
 enum EspecialidadMedica {
   CARDIOLOGIA
@@ -30,19 +31,19 @@ enum EspecialidadMedica {
   TRAUMATOLOGIA
   DERMATOLOGIA
   CLINICA_GENERAL
-} 
-
-
-model Medico {
-  id        Int      @id @default(autoincrement())
-  nombre     String 
-  apellido String  
-  especialidadMedica EspecialidadMedica
-  telefono  String
-  email    String   @unique
-  citas Cita[]
 }
 
+model Medico {
+  id                 Int                @id @default(autoincrement())
+  nombre             String
+  apellido           String
+  especialidadMedica EspecialidadMedica @map("especialidad_medica")
+  telefono           String
+  email              String             @unique
+  citas              Cita[]
+
+  @@map("medicos")
+}
 
 enum EstadoCita {
   PROGRAMADA
@@ -53,14 +54,14 @@ enum EstadoCita {
 model Cita {
   id         Int        @id @default(autoincrement())
   fecha      DateTime
-  pacienteId Int
+  pacienteId Int        @map("paciente_id")
   paciente   Paciente   @relation(fields: [pacienteId], references: [id])
-  medicoId   Int
+  medicoId   Int        @map("medico_id")
   medico     Medico     @relation(fields: [medicoId], references: [id])
   estado     EstadoCita @default(PROGRAMADA)
 
+  @@map("citas")
 }
-
 
 enum Role {
   RECEPCIONISTA
@@ -73,4 +74,6 @@ model User {
   email    String @unique
   password String
   role     Role
+
+  @@map("users")
 }
