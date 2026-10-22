@@ -2,6 +2,7 @@
 import { Router } from "express";
 import {
   createAppointmentController,
+  getAppointmentsController,
   updateAppointmentStatusController,
 } from "../controllers/appointment.controller.js";
 import {
@@ -12,6 +13,13 @@ import { verifyToken } from "../middlewares/auth.middleware.js";
 import { authorize } from "../middlewares/authorize.middleware.js";
 
 const router = Router();
+
+router.get(
+  "/",
+  verifyToken,
+  authorize("RECEPCIONISTA", "MEDICO", "GERENCIA"),
+  getAppointmentsController
+);
 
 router.post(
   "/",
