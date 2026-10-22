@@ -32,7 +32,7 @@ router.post(
 router.patch(
   "/:id/status",
   verifyToken,
-  authorize("MEDICO"),
+  authorize("MEDICO", "RECEPCIONISTA"),
   validateAppointmentStatus,
   updateAppointmentStatusController
 );

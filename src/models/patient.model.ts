@@ -21,3 +21,11 @@ export function getPatientById(id: number) {
     },
   });
 }
+
+export function updatePatient(id: number, data: Prisma.PacienteUpdateInput) {
+  return prisma.paciente.update({ where: { id }, data });
+}
+
+export function deletePatient(id: number) {
+  return prisma.paciente.delete({ where: { id } });
+}
