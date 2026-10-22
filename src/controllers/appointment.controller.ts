@@ -2,12 +2,14 @@
 import type { Request, Response } from "express";
 import {
   createAppointment,
+  getAppointments,
   getDoctorAgenda,
   updateAppointmentStatus,
 } from "../models/appointment.model.js";
 import { getPatientById } from "../models/patient.model.js";
 import { getDoctorById } from "../models/doctor.model.js";
 import { Prisma } from "../generated/prisma/client.js";
+import type { EstadoCita } from "../generated/prisma/client.js";
 
 export async function createAppointmentController(req: Request, res: Response) {
   /*
@@ -112,5 +114,34 @@ export async function updateAppointmentStatusController(req: Request, res: Respo
       return res.status(404).json({ error: "Cita no encontrada" });
     }
     res.status(500).json({ error: "Error al actualizar el estado de la cita" });
+  }
+}
+
+const ESTADOS_VALIDOS: readonly string[] = ["PROGRAMADA", "COMPLETADA", "CANCELADA"];
+const esEstadoCita = (valor: string): valor is EstadoCita => ESTADOS_VALIDOS.includes(valor);
+
+export async function getAppointmentsController(req: Request, res: Response) {
+  /*
+    #swagger.tags = ['Citas']
+    #swagger.summary = 'Listar citas, opcionalmente filtradas por estado'
+    #swagger.parameters['estado'] = { in: 'query', description: 'Filtrar por estado', required: false, type: 'string', enum: ['PROGRAMADA', 'COMPLETADA', 'CANCELADA'] }
+    #swagger.responses[200] = { description: "Array de citas con paciente y médico" }
+    #swagger.responses[400] = { description: "Estado inválido" }
+    #swagger.responses[500] = { description: "Error al obtener las citas" }
+  */
+  try {
+    const estadoQuery =
+      typeof req.query.estado === "string" ? req.query.estado.toUpperCase() : undefined;
+
+    if (estadoQuery && !esEstadoCita(estadoQuery)) {
+      return res
+        .status(400)
+        .json({ error: "Estado inválido. Usá PROGRAMADA, COMPLETADA o CANCELADA" });
+    }
+
+    const citas = await getAppointments(estadoQuery);
+    res.status(200).json(citas);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener las citas" });
   }
 }
