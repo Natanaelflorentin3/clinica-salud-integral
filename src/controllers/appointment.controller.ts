@@ -130,16 +130,21 @@ export async function getAppointmentsController(req: Request, res: Response) {
     #swagger.responses[500] = { description: "Error al obtener las citas" }
   */
   try {
-    const estadoQuery =
-      typeof req.query.estado === "string" ? req.query.estado.toUpperCase() : undefined;
+    let estado: EstadoCita | undefined;
 
-    if (estadoQuery && !esEstadoCita(estadoQuery)) {
-      return res
-        .status(400)
-        .json({ error: "Estado inválido. Usá PROGRAMADA, COMPLETADA o CANCELADA" });
+    if (typeof req.query.estado === "string") {
+      const valor = req.query.estado.toUpperCase();
+
+      if (!esEstadoCita(valor)) {
+        return res
+          .status(400)
+          .json({ error: "Estado inválido. Usá PROGRAMADA, COMPLETADA o CANCELADA" });
+      }
+
+      estado = valor; // acá TypeScript ya sabe que es un EstadoCita válido
     }
 
-    const citas = await getAppointments(estadoQuery);
+    const citas = await getAppointments(estado);
     res.status(200).json(citas);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener las citas" });
