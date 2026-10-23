@@ -5,6 +5,7 @@ import {
   deletePatient,
   getAllPatients,
   getPatientById,
+  searchPatients,
   updatePatient,
 } from "../models/patient.model.js";
 import { Prisma } from "../generated/prisma/client.js";
@@ -46,12 +47,29 @@ export async function createPatientController(req: Request, res: Response) {
 export async function getAllPatientsController(req: Request, res: Response) {
   /*
     #swagger.tags = ['Pacientes']
-    #swagger.summary = 'Listar todos los pacientes'
-    #swagger.responses[200] = { description: "Array de pacientes" }
+    #swagger.summary = 'Listar pacientes (con búsqueda y paginación opcionales)'
+    #swagger.parameters['query'] = { in: 'query', description: 'Buscar por nombre, apellido o email', required: false, type: 'string' }
+    #swagger.parameters['pagina'] = { in: 'query', description: 'Número de página (si se manda, la respuesta es paginada)', required: false, type: 'integer' }
+    #swagger.parameters['limite'] = { in: 'query', description: 'Resultados por página (1 a 100, default 10)', required: false, type: 'integer' }
+    #swagger.responses[200] = { description: "Array de pacientes, o { data, total, pagina, totalPaginas } si se manda ?pagina" }
     #swagger.responses[500] = { description: "Error al obtener los pacientes" }
   */
   try {
-    const pacientes = await getAllPatients();
+    const query =
+      typeof req.query.query === "string" && req.query.query.trim() !== ""
+        ? req.query.query.trim()
+        : undefined;
+
+    // Con ?pagina → respuesta paginada { data, total, pagina, totalPaginas }
+    if (req.query.pagina !== undefined) {
+      const pagina = Math.max(1, Number(req.query.pagina) || 1);
+      const limite = Math.min(100, Math.max(1, Number(req.query.limite) || 10));
+      const resultado = await searchPatients(query, pagina, limite);
+      return res.status(200).json(resultado);
+    }
+
+    // Sin ?pagina → array plano, como antes (no rompe a quien ya lo usa)
+    const pacientes = await getAllPatients(query);
     res.status(200).json(pacientes);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener los pacientes" });
