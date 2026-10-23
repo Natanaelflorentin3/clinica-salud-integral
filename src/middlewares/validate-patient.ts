@@ -20,3 +20,17 @@ export function validatePatient(req: Request, res: Response, next: NextFunction)
   req.body = result.data; // reemplaza el body por la versión ya validada/convertida (ej: fechaNacimiento como Date real, no string)
   next();
 }
+
+// Para PUT: todos los campos son opcionales, pero los que vengan se validan igual
+export const patientUpdateSchema = patientSchema.partial();
+
+export function validatePatientUpdate(req: Request, res: Response, next: NextFunction) {
+  const result = patientUpdateSchema.safeParse(req.body);
+
+  if (!result.success) {
+    return res.status(400).json({ error: result.error.issues });
+  }
+
+  req.body = result.data;
+  next();
+}
