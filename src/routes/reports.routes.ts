@@ -10,7 +10,7 @@ import { authorize } from "../middlewares/authorize.middleware.js";
 
 const router = Router();
 
-router.get("/appointments-by-specialty", verifyToken, authorize("GERENCIA"), getAppointmentsBySpecialtyController);
+router.get("/appointments-by-specialty", verifyToken, authorize("GERENCIA", "RECEPCIONISTA"), getAppointmentsBySpecialtyController);
 router.get("/daily-cutoff", verifyToken, authorize("GERENCIA"), validateDailyCutoffQuery, getDailyCutoffController);
 
 export default router;
