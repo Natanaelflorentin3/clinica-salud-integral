@@ -66,7 +66,7 @@ export async function login(req: Request, res: Response) {
     }
     #swagger.responses[200] = {
       description: "Login exitoso",
-      content: { "application/json": { schema: { type: "object", properties: { token: { type: "string" } } } } }
+      content: { "application/json": { schema: { type: "object", properties: { token: { type: "string" }, usuario: { type: "object", properties: { id: { type: "integer" }, nombre: { type: "string" }, email: { type: "string" }, rol: { type: "string" } } } } } } }
     }
     #swagger.responses[401] = { description: "Credenciales inválidas" }
     #swagger.responses[500] = { description: "Error al iniciar sesión" }
@@ -85,7 +85,17 @@ export async function login(req: Request, res: Response) {
       { expiresIn: "8h" }
     );
 
-    res.json({ token });
+    // Devolvemos también los datos públicos del usuario (nunca la contraseña).
+    // El modelo User no tiene nombre: usamos la parte del email antes del @.
+    res.json({
+      token,
+      usuario: {
+        id: user.id,
+        nombre: user.email.split("@")[0],
+        email: user.email,
+        rol: user.role,
+      },
+    });
   } catch {
     res.status(500).json({ message: "Error al iniciar sesión" });
   }
