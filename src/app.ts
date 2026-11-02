@@ -1,6 +1,3 @@
-import { readFileSync } from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 import express from "express";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
@@ -9,11 +6,9 @@ import doctorRoutes from "./routes/doctor.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import appointmentRoutes from "./routes/appointment.routes.js";
 import reportsRoutes from "./routes/reports.routes.js";
+// Import directo del JSON: así viaja dentro del deploy de Vercel (readFileSync podía quedar afuera)
+import swaggerFile from "./swagger-output.json" with { type: "json" };
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const swaggerFile = JSON.parse(
-  readFileSync(join(__dirname, "swagger-output.json"), "utf-8")
-);
 
 const app = express();
 

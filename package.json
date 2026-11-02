@@ -7,7 +7,9 @@
     "dev": "tsx --watch --env-file=.env src/index.ts",
     "check": "tsc --noEmit",
     "build": "tsc",
-    "swagger": "tsx src/swagger.ts"
+    "swagger": "tsx src/swagger.ts",
+    "postinstall": "prisma generate --config prisma7.config.ts",
+    "migrate:deploy": "prisma migrate deploy --config prisma7.config.ts"
   },
   "keywords": [],
   "author": "",
