@@ -32,3 +32,25 @@ export function getAppointments(estado?: EstadoCita) {
     orderBy: { fecha: "asc" },
   });
 }
+
+// Versión paginada: { data, total, pagina, totalPaginas }. Las más recientes primero.
+export async function getAppointmentsPaginated(
+  estado: EstadoCita | undefined,
+  pagina: number,
+  limite: number
+) {
+  const where = estado ? { estado } : {};
+
+  const [data, total] = await Promise.all([
+    prisma.cita.findMany({
+      where,
+      include: { paciente: true, medico: true },
+      orderBy: { fecha: "desc" },
+      skip: (pagina - 1) * limite,
+      take: limite,
+    }),
+    prisma.cita.count({ where }),
+  ]);
+
+  return { data, total, pagina, totalPaginas: Math.max(1, Math.ceil(total / limite)) };
+}

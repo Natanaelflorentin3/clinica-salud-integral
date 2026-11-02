@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import {
   createAppointment,
   getAppointments,
+  getAppointmentsPaginated,
   getDoctorAgenda,
   updateAppointmentStatus,
 } from "../models/appointment.model.js";
@@ -123,9 +124,11 @@ const esEstadoCita = (valor: string): valor is EstadoCita => ESTADOS_VALIDOS.inc
 export async function getAppointmentsController(req: Request, res: Response) {
   /*
     #swagger.tags = ['Citas']
-    #swagger.summary = 'Listar citas, opcionalmente filtradas por estado'
+    #swagger.summary = 'Listar citas (filtro por estado y paginación opcionales)'
     #swagger.parameters['estado'] = { in: 'query', description: 'Filtrar por estado', required: false, type: 'string', enum: ['PROGRAMADA', 'COMPLETADA', 'CANCELADA'] }
-    #swagger.responses[200] = { description: "Array de citas con paciente y médico" }
+    #swagger.parameters['pagina'] = { in: 'query', description: 'Número de página (si se manda, la respuesta es paginada)', required: false, type: 'integer' }
+    #swagger.parameters['limite'] = { in: 'query', description: 'Resultados por página (1 a 100, default 10)', required: false, type: 'integer' }
+    #swagger.responses[200] = { description: "Array de citas con paciente y médico, o { data, total, pagina, totalPaginas } si se manda ?pagina" }
     #swagger.responses[400] = { description: "Estado inválido" }
     #swagger.responses[500] = { description: "Error al obtener las citas" }
   */
@@ -144,6 +147,15 @@ export async function getAppointmentsController(req: Request, res: Response) {
       estado = valor; // acá TypeScript ya sabe que es un EstadoCita válido
     }
 
+    // Con ?pagina → respuesta paginada { data, total, pagina, totalPaginas }
+    if (req.query.pagina !== undefined) {
+      const pagina = Math.max(1, Number(req.query.pagina) || 1);
+      const limite = Math.min(100, Math.max(1, Number(req.query.limite) || 10));
+      const resultado = await getAppointmentsPaginated(estado, pagina, limite);
+      return res.status(200).json(resultado);
+    }
+
+    // Sin ?pagina → array plano, como antes
     const citas = await getAppointments(estado);
     res.status(200).json(citas);
   } catch (error) {
