@@ -17,7 +17,13 @@ const swaggerFile = JSON.parse(
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+// Orígenes permitidos: localhost en desarrollo + la URL de Vercel en producción.
+// FRONTEND_URL puede tener varias separadas por coma.
+const origenesPermitidos = (process.env.FRONTEND_URL ?? "http://localhost:5173")
+  .split(",")
+  .map((origen) => origen.trim());
+
+app.use(cors({ origin: origenesPermitidos }));
 app.use(express.json());
 
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
